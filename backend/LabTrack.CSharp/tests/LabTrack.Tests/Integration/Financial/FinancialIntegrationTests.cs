@@ -46,12 +46,9 @@ public class FinancialIntegrationTests : IAsyncLifetime
         {
             Id = expenseId,
             AssetId = assetId,
-            // RepairTicketId = ticketId,               // ⚠️ CS0117 — wala sa FinancialExpense
             Amount = 450.75m,
             Category = "Hardware Upgrade",
             Description = "GPU Replacement for AI Station",
-            // ExpenseDate = DateTime.UtcNow.AddDays(-2),   // ⚠️ CS0117
-            // CreatedAt = DateTime.UtcNow,                 // ⚠️ CS0117
         };
 
         await _dbContext.FinancialExpenses.AddAsync(expense);
@@ -79,8 +76,6 @@ public class FinancialIntegrationTests : IAsyncLifetime
             Amount = 1200.00m,
             Category = "Maintenance",
             Description = "Annual Server Rack Servicing",
-            // ExpenseDate = DateTime.UtcNow,               // ⚠️ CS0117
-            // CreatedAt = DateTime.UtcNow,                 // ⚠️ CS0117
         };
 
         // Act
@@ -100,13 +95,6 @@ public class FinancialIntegrationTests : IAsyncLifetime
     [Fact]
     public async Task GetExpensesByDateRange_FiltersExpenseRecordsAccurately()
     {
-        // ⚠️ TODO: "ExpenseDate" ay hindi C# property sa FinancialExpense.
-        //    Ina-assume na ito ang tamang EF property name.
-        //    Kung may runtime error na "property 'ExpenseDate' not found",
-        //    hanapin ang totoong pangalan: findstr /n "public" src\LabTrack.Domain\Entities\FinancialExpense.cs
-        //    at palitan ang "ExpenseDate" sa ibaba.
-        const string DateProperty = "ExpenseDate";
-
         var baseDate = new DateTime(2026, 10, 1, 0, 0, 0, DateTimeKind.Utc);
 
         var expenses = new List<FinancialExpense>
@@ -116,24 +104,21 @@ public class FinancialIntegrationTests : IAsyncLifetime
                 Id = Guid.NewGuid(),
                 Amount = 150.00m,
                 Category = "Peripherals",
-                // ExpenseDate = baseDate.AddDays(2),        // ⚠️ CS0117
-                // CreatedAt = DateTime.UtcNow,             // ⚠️ CS0117
+                ExpenseDateUtc = baseDate.AddDays(2)
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 Amount = 300.00m,
                 Category = "Network",
-                // ExpenseDate = baseDate.AddDays(10),      // ⚠️ CS0117
-                // CreatedAt = DateTime.UtcNow,             // ⚠️ CS0117
+                ExpenseDateUtc = baseDate.AddDays(10)
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 Amount = 500.00m,
                 Category = "Licensing",
-                // ExpenseDate = baseDate.AddDays(25),      // ⚠️ CS0117
-                // CreatedAt = DateTime.UtcNow,             // ⚠️ CS0117
+                ExpenseDateUtc = baseDate.AddDays(25)
             }
         };
 
@@ -143,20 +128,16 @@ public class FinancialIntegrationTests : IAsyncLifetime
         var startDate = baseDate;
         var endDate = baseDate.AddDays(15);
 
-        // Act — EF.Property para compile-clean (property names as strings)
+        // Act
         var filteredExpenses = await _dbContext.FinancialExpenses
-            .Where(e => EF.Property<DateTime>(e, DateProperty) >= startDate
-                     && EF.Property<DateTime>(e, DateProperty) <= endDate)
+            .Where(e => e.ExpenseDateUtc >= startDate && e.ExpenseDateUtc <= endDate)
             .AsNoTracking()
             .ToListAsync();
 
         // Assert
         Assert.Equal(2, filteredExpenses.Count);
         Assert.All(filteredExpenses, e =>
-        {
-            var d = EF.Property<DateTime>(e, DateProperty);
-            Assert.True(d >= startDate && d <= endDate);
-        });
+            Assert.True(e.ExpenseDateUtc >= startDate && e.ExpenseDateUtc <= endDate));
     }
 
     [Fact]
@@ -169,8 +150,6 @@ public class FinancialIntegrationTests : IAsyncLifetime
             Id = expenseId,
             Amount = 85.50m,
             Category = "Cable Replacement",
-            // ExpenseDate = DateTime.UtcNow,               // ⚠️ CS0117
-            // CreatedAt = DateTime.UtcNow,                 // ⚠️ CS0117
         };
 
         await _dbContext.FinancialExpenses.AddAsync(expense);

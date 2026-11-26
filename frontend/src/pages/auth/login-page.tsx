@@ -1,7 +1,8 @@
+import '@/components/SkeletonLoader3D';
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { Lock, Eye, EyeOff, User, Key, ShieldCheck, AlertCircle, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
-import { AuthLayout, AuthRole } from "../../components/auth/AuthLayout";
+import { AuthLayout, AuthRole } from '@/layouts/AuthLayout';
 import apiClient from "@/lib/api-client";
 
 export const LoginPage: React.FC = () => {

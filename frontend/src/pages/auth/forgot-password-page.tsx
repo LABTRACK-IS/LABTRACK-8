@@ -1,10 +1,11 @@
+import '@/components/SkeletonLoader3D';
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   Mail, ArrowLeft, Send, Loader2, KeyRound, Lock, Eye, EyeOff,
   CheckCircle2, ShieldCheck, RefreshCw, AlertCircle, Sparkles, Copy, Check
 } from "lucide-react";
-import { AuthLayout, AuthRole } from "../../components/auth/AuthLayout";
+import { AuthLayout, AuthRole } from '@/layouts/AuthLayout';
 import apiClient from "@/lib/api-client";
 
 export const ForgotPasswordPage: React.FC = () => {

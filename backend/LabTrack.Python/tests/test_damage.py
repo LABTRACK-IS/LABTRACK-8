@@ -5,7 +5,7 @@ import uuid
 
 from app.services.estimation_service import EstimationService
 from app.schemas.common import APIResponseEnvelope
-from app.exceptions import LLMInferenceException
+from app.core.exceptions import LLMInferenceException
 
 
 @pytest.fixture

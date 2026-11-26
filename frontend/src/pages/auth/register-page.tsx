@@ -1,7 +1,8 @@
+import '@/components/SkeletonLoader3D';
 import React, { useState } from 'react';
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { Lock, Eye, EyeOff, User, Mail, MapPin, Key, AlertCircle, ArrowLeft, Sparkles } from "lucide-react";
-import { AuthLayout, AuthRole } from "../../components/auth/AuthLayout";
+import { AuthLayout, AuthRole } from '@/layouts/AuthLayout';
 import apiClient from '@/lib/api-client';
 
 

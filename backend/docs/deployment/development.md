@@ -24,16 +24,16 @@ docker compose logs -f
 # Stop and tear down container instances and volumes
 docker compose down -v
 4. Local Development Without Containers (Hybrid Mode)For rapid iteration on backend C# code or Python AI scripts, you can run services natively while keeping supporting infrastructure in Docker.4.1 Start Supporting Infrastructure OnlyBashdocker compose up -d postgres
-4.2 Run the .NET 8 Backend API NativelyBashcd src/LabTrack.Api
+4.2 Run the .NET 8 Backend API NativelyBashcd LabTrack.CSharp/src/LabTrack.Api
 dotnet restore
 dotnet run --environment Development
-API Endpoint: http://localhost:5000 (Direct) / https://localhost:5001 (HTTPS)Swagger UI: Available at http://localhost:5000/swagger during local development.4.3 Run the Python AI Engine NativelyBashcd backend/python
+API Endpoint: http://localhost:5000 (Direct) / https://localhost:5001 (HTTPS)Swagger UI: Available at http://localhost:5000/swagger during local development.4.3 Run the Python AI Engine NativelyBashcd LabTrack.Python
 python -m venv venv
 source venv/bin/activate  # On Windows use: venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 5. Running Tests & Code Quality Checks5.1 C# Backend Unit & Integration TestsBashdotnet test LabTrack.sln --configuration Release --verbosity normal
-5.2 Python AI Unit TestsBashcd backend/python
+5.2 Python AI Unit TestsBashcd LabTrack.Python
 pytest tests/ -v --cov=app
 5.3 Database Schema Integrity VerificationAfter initializing your local database, run the verification functions via psql or your database client:SQLSELECT * FROM public.fn_verify_labtrack_schema_deployment();
 SELECT * FROM audit.fn_verify_forensic_ledger_integrity(

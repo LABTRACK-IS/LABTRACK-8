@@ -10,7 +10,7 @@ from app.schemas.ai import (
     DiagnosticsAnalysisRequestSchema,
     DiagnosticsAnalysisResponseSchema,
 )
-from app.exceptions import LLMInferenceException
+from app.core.exceptions import LLMInferenceException
 
 
 @pytest.fixture

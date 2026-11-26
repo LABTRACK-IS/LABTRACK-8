@@ -1,11 +1,9 @@
 import logging
 import uuid
 from typing import List, Optional
-from datetime import datetime
 
 from app.clients.csharp_api import CSharpApiClient
-from app.exceptions import CSharpServiceUnavailableException
-from app.schemas.common import PaginatedResponse
+from app.core.exceptions import CSharpServiceUnavailableException
 from app.schemas.repair import (
     RepairTicketCreateSchema,
     RepairTicketResponseSchema,

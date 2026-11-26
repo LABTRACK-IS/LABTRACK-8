@@ -57,7 +57,7 @@ FROM auth.security_incidents
 WHERE incident_type = 'BRUTE_FORCE_LOCKOUT'
 ORDER BY created_at DESC
 LIMIT 10;
-If verified as legitimate, administrators can manually clear the lockout timestamp in auth.users.
+If verified as legitimate, administrators can manually clear the lockout timestamp in public.Users.
 
 4. Diagnostic SQL Toolkit for Administrators
 Run the following administrative queries directly against the PostgreSQL 16 database to troubleshoot session and security state:
@@ -73,8 +73,8 @@ SELECT
     us.expires_at,
     us.is_active
 FROM auth.user_sessions us
-JOIN auth.users u ON us.user_id = u.id
-JOIN auth.roles r ON u.role_id = r.id
+JOIN public.Users u ON us.user_id = u.id
+JOIN public.Roles r ON u.role_id = r.id
 WHERE us.is_active = TRUE
 ORDER BY us.created_at DESC;
 4.2 Verify Revoked Token Blacklist
@@ -84,6 +84,6 @@ SELECT
     user_id,
     revocation_reason,
     revoked_at
-FROM auth.revoked_tokens
+FROM public.RevokedTokens
 ORDER BY revoked_at DESC
 LIMIT 50;

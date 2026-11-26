@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, HTTPException, status, Query
+from fastapi import APIRouter, HTTPException, status, Query
 from pydantic import BaseModel, Field
 from typing import List, Optional, Any
 from datetime import datetime

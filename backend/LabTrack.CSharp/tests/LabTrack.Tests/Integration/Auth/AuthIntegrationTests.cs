@@ -47,16 +47,12 @@ public class AuthIntegrationTests : IAsyncLifetime
             FirstName = "Alex",
             LastName = "Mercer",
             IsActive = true,
-            // CreatedAt = DateTime.UtcNow,             // ⚠️ CS0117 — wala sa User entity
             AuthSessions = new List<AuthSession>
             {
                 new()
                 {
                     Id = Guid.NewGuid(),
                     UserId = userId,
-                    // TokenHash = "hash-token-12345",           // ⚠️ CS0117 — wala sa AuthSession
-                    // ExpiresAt = DateTime.UtcNow.AddHours(24), // ⚠️ CS0117
-                    // CreatedAt = DateTime.UtcNow              // ⚠️ CS0117
                 }
             }
         };
@@ -89,7 +85,6 @@ public class AuthIntegrationTests : IAsyncLifetime
             FirstName = "Jordan",
             LastName = "Vance",
             IsActive = true,
-            // CreatedAt = DateTime.UtcNow,             // ⚠️ CS0117
         };
 
         await _dbContext.Users.AddAsync(user);
@@ -99,9 +94,6 @@ public class AuthIntegrationTests : IAsyncLifetime
         {
             Id = Guid.NewGuid(),
             UserId = userId,
-            // TokenHash = "secure-jwt-hash-value",     // ⚠️ CS0117
-            // ExpiresAt = DateTime.UtcNow.AddHours(8), // ⚠️ CS0117
-            // CreatedAt = DateTime.UtcNow              // ⚠️ CS0117
         };
 
         // Act
@@ -127,9 +119,6 @@ public class AuthIntegrationTests : IAsyncLifetime
         {
             Id = sessionId,
             UserId = userId,
-            // TokenHash = "revocable-token-hash",      // ⚠️ CS0117
-            // ExpiresAt = DateTime.UtcNow.AddHours(1), // ⚠️ CS0117
-            // CreatedAt = DateTime.UtcNow              // ⚠️ CS0117
         };
 
         await _dbContext.AuthSessions.AddAsync(session);
@@ -156,7 +145,6 @@ public class AuthIntegrationTests : IAsyncLifetime
             FirstName = "Sam",
             LastName = "Oak",
             IsActive = true,
-            // CreatedAt = DateTime.UtcNow,             // ⚠️ CS0117
         };
 
         await _dbContext.Users.AddAsync(user);

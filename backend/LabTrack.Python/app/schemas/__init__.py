@@ -1,4 +1,4 @@
-﻿from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, Any
 
 class BaseSchema(BaseModel):

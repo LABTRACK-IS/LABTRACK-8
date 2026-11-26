@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as signalR from '@microsoft/signalr';
-import { resolveSignalRHubUrl, SIGNALR_ENDPOINTS } from '../lib/signalr';
+import { resolveSignalRHubUrl, SIGNALR_ENDPOINTS } from '@/lib/signalr';
 
 export const useRealtime = (onDataUpdate?: () => void, onNotificationUpdate?: () => void) => {
   const callbackRef = useRef({ onDataUpdate, onNotificationUpdate });

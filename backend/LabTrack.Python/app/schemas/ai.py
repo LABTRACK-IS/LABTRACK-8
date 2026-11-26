@@ -1,13 +1,8 @@
-﻿from pydantic import Field
+from pydantic import Field
 from typing import List, Optional, Dict, Any, Union
 from datetime import datetime
 import uuid
 from app.schemas import BaseSchema
-
-class ChatMessageSchema(BaseSchema):
-    role: str = Field(...)
-    content: str = Field(...)
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 class ChatRequestSchema(BaseSchema):
     session_id: Optional[uuid.UUID] = Field(None)

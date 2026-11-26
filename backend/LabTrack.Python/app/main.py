@@ -1,23 +1,29 @@
-﻿import logging
-from datetime import datetime
-from contextlib import asynccontextmanager
+import asyncio
+import logging
+from contextlib import asynccontextmanager, suppress
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.config import settings
-from app.exceptions import (
+from app.core.config import settings
+from app.core.exceptions import (
     AssetNotFoundException,
     CSharpServiceUnavailableException,
     LLMInferenceException,
     LabTrackException,
 )
-from app.middleware import CorrelationIdMiddleware, RequestLoggingMiddleware
+from app.core.middleware import CorrelationIdMiddleware, RequestLoggingMiddleware
+from app.core.banner import log_status_box, db_connection_watcher
 from app.schemas.common import APIResponseEnvelope
-from app.api.routes.health import _check_database
 from app.api.routes import api_router
-from app.db.vector_db import init_vector_db, check_vector_db_health
+from app.db.connection import check_main_db_health, dispose_main_db
+from app.db.vector_db import (
+    init_vector_db,
+    ensure_vector_extension,
+    check_vector_db_health,
+    dispose_vector_db,
+)
 
 logging.basicConfig(
     level=logging.INFO if not settings.DEBUG else logging.DEBUG,
@@ -30,40 +36,34 @@ logger = logging.getLogger("LabTrack.Python.Main")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    watcher_task: asyncio.Task | None = None
     try:
-        db_health = await _check_database()
-        vector_result = init_vector_db()
-        vector_health = (
-            await check_vector_db_health()
-            if vector_result["status"] == "connected"
-            else {}
-        )
+        init_vector_db()
+        db_health = await check_main_db_health(silent=True)
+        main_ok = db_health.get("status") == "connected"
 
-        main_status = "CONNECTED" if db_health["status"] == "connected" else "FAILED"
-        vec_status = "CONNECTED" if vector_result["status"] == "connected" else "FAILED"
-        main_db = db_health.get("database", "-")
-        main_user = db_health.get("user", "-")
-        vec_version = vector_health.get("pgvector_version", "-")
-        ready = "READY" if main_status == "CONNECTED" and vec_status == "CONNECTED" else "DEGRADED"
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if main_ok:
+            await ensure_vector_extension()
+            vector_health = await check_vector_db_health(silent=True)
+        else:
+            vector_health = {"status": "disconnected", "pgvector_version": "unavailable"}
 
-        w = 56
-        line = "+" + "-" * w + "+"
-        logger.info(line)
-        logger.info(f"| {'LabTrack.Python - AI ENGINE':<{w}} |")
-        logger.info(line)
-        logger.info(f"| {f'Date        : {now}':<{w}} |")
-        logger.info(f"| {f'App         : {settings.APP_NAME}':<{w}} |")
-        logger.info(f"| {f'Environment : {settings.ENVIRONMENT}':<{w}} |")
-        logger.info(f"| {f'MAIN DB     : {main_status} - {main_db} @ {main_user}':<{w}} |")
-        logger.info(f"| {f'VECTOR DB   : {vec_status} - pgvector {vec_version}':<{w}} |")
-        logger.info(f"| {f'Status      : {ready}':<{w}} |")
-        logger.info(line)
+        vec_ok = vector_health.get("status") == "connected"
+        log_status_box(db_health, vector_health)
+
+        watcher_task = asyncio.create_task(db_connection_watcher((main_ok, vec_ok)))
     except Exception as exc:
         logger.exception(f"Startup check failed: {exc}")
 
     yield
 
+    if watcher_task is not None:
+        watcher_task.cancel()
+        with suppress(asyncio.CancelledError):
+            await watcher_task
+
+    await dispose_vector_db()
+    await dispose_main_db()
     logger.info(f"Shutting down {settings.APP_NAME}...")
 
 
@@ -149,21 +149,27 @@ async def handle_unhandled_exception(request: Request, exc: Exception):
 
 @app.get("/health", tags=["Infrastructure"], response_model=APIResponseEnvelope[dict])
 async def health_check():
-    db_health = await _check_database()
-    vector_health = await check_vector_db_health()
-    is_healthy = db_health["status"] == "connected"
+    db_health = await check_main_db_health(silent=True)
+    main_ok = db_health.get("status") == "connected"
+    vector_health = (
+        await check_vector_db_health(silent=True)
+        if main_ok
+        else {"status": "disconnected", "pgvector_version": "unavailable"}
+    )
+    vec_ok = vector_health.get("status") == "connected"
+    is_healthy = main_ok and vec_ok
 
     return APIResponseEnvelope(
         success=is_healthy,
         message=(
             "Service is healthy and operational."
             if is_healthy
-            else "Service degraded: database disconnected."
+            else "Service degraded: PostgreSQL database disconnected."
         ),
         data={
             "app_name": settings.APP_NAME,
             "environment": settings.ENVIRONMENT,
-            "status": "UP" if is_healthy else "DEGRADED",
+            "status": "UP" if is_healthy else "DISCONNECTED",
             "database": db_health,
             "vector_database": vector_health,
         },
@@ -179,5 +185,3 @@ if __name__ == "__main__":
         port=settings.PORT,
         reload=settings.DEBUG,
     )
-
-

@@ -16,7 +16,7 @@ Bash
 #!/bin/bash
 # =============================================================================
 # LabTrack Automated Database Backup Script
-# Target: PostgreSQL 16 (Multi-Schema Instance)
+# Target: PostgreSQL 16 (public schema (EF Core) Instance)
 # =============================================================================
 
 set -e

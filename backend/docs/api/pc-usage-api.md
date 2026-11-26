@@ -10,7 +10,7 @@ WebSocket Endpoint: ws://localhost/hubs/telemetry
 
 Authentication: Bearer Token (Admin or Technician roles for ingestion/management; Researcher for view)
 
-Underlying Tables & Views: telemetry.pc_workstations, inventory.asset_telemetry_summaries, inventory.v_asset_details_comprehensive
+Underlying Tables & Views: telemetry.pc_workstations, public.AssetTelemetrySummaries, inventory.v_asset_details_comprehensive
 
 2. API Endpoints
 2.1 Ingest Telemetry Heartbeat

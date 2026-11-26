@@ -11,7 +11,7 @@ from app.security.internal_auth import (
     ServiceIdentity,
     generate_internal_signature,
 )
-from app.config import settings
+from app.core.config import settings
 
 
 # --- JWT Authentication Tests ---

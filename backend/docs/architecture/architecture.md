@@ -33,7 +33,7 @@ LabTrack follows a modular Clean Architecture pattern, containerized using Docke
 v
 +---------------------------------------+
 |        PostgreSQL 16 Database         |
-| (8 Schemas, pgvector, SHA-256 Audit)  |
+| (public schema (EF Core), pgvector, SHA-256 Audit)  |
 +---------------------------------------+
 
 
@@ -78,6 +78,6 @@ v
 ## 3. Key Architectural Patterns & Guarantees
 
 1. **Row Level Security (RLS):** All database tables strictly enforce RLS policies parameterized by `app.current_user_id` set per HTTP transaction.
-2. **Cryptographic Forensic Auditing:** The `audit.forensic_ledger` table enforces continuous SHA-256 hash chaining ($H_n = \text{SHA256}(H_{n-1} \parallel \text{Payload})$) to guarantee zero-tampering records.
+2. **Cryptographic Forensic Auditing:** The `public.ForensicLedger` table enforces continuous SHA-256 hash chaining ($H_n = \text{SHA256}(H_{n-1} \parallel \text{Payload})$) to guarantee zero-tampering records.
 3. **Optimistic Concurrency Control (OCC):** Mutable entities implement integer `version` properties auto-incremented by database triggers to prevent write race conditions.
 4. **Idempotent API Operations:** Non-idempotent state

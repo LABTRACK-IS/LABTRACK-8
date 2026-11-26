@@ -4,7 +4,7 @@ from typing import List, Optional
 from datetime import datetime
 
 from app.clients.csharp_api import CSharpApiClient
-from app.exceptions import AssetNotFoundException, CSharpServiceUnavailableException
+from app.core.exceptions import AssetNotFoundException, CSharpServiceUnavailableException
 from app.schemas.asset import (
     AssetCreateSchema,
     AssetResponseSchema,

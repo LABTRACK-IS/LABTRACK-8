@@ -1,8 +1,8 @@
-﻿import httpx
+import httpx
 import time
 from jose import jwt
 from typing import Any, Optional
-from app.config import settings
+from app.core.config import settings
 
 class CSharpApiClient:
     """Authenticated HTTP client wrapper for the LabTrack C# backend."""

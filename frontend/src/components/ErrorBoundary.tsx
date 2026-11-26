@@ -19,7 +19,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div style={{ padding: 20, fontFamily: 'monospace', background: '#0a0a0a', color: '#ff5555', minHeight: '100vh', overflow: 'auto' }}>
-          <h1 style={{ fontSize: 24, marginBottom: 20 }}>⚠️ Runtime Error — Copy Mo Ito</h1>
+          <h1 style={{ fontSize: 24, marginBottom: 20 }}>System Runtime Error — Copy Details</h1>
           <h2 style={{ color: '#ffaa00', fontSize: 18 }}>Message:</h2>
           <pre style={{ background: '#000', padding: 15, fontSize: 14, whiteSpace: 'pre-wrap', border: '1px solid #ff5555', borderRadius: 8 }}>
             {this.state.error?.message}
@@ -43,3 +43,5 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 }
 export default ErrorBoundary;
+
+

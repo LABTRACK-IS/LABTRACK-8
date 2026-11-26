@@ -5,3 +5,16 @@ target-version = ["py311"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.pyright]
+venvPath = "."
+venv = "venv"
+extraPaths = ["."]
+reportMissingImports = false
+reportMissingModuleSource = false

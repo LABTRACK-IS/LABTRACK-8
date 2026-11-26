@@ -244,7 +244,7 @@ export const AboutPage: React.FC = () => {
           <div className="lg:col-span-5">
             <div className="animate-float-3d relative p-1 rounded-[2.5rem] bg-gradient-to-b from-blue-500/30 via-slate-800/40 to-cyan-500/20 backdrop-blur-2xl border border-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
               
-              <div className="rounded-[2.2rem] bg-slate-950 border border-slate-800 p-6 sm:p-8 space-y-6 relative overflow-hidden">
+              <div className="rounded-[2.2rem] bg-slate-950 border border-slate-800 p-6 sm:p-8 space-y-6">
                 
                 {/* Ambient Internal Glow */}
                 <div className="absolute top-0 right-0 w-48 h-48 bg-blue-600/10 blur-[80px] rounded-full pointer-events-none" />
@@ -332,7 +332,7 @@ export const AboutPage: React.FC = () => {
         </div>
 
         {/* 2. ORGANIZED GANTT CHART & TEAM STRUCTURE SECTION (/assets/images/sven.jpg - SAKTONG LAKI) */}
-        <div className="p-6 sm:p-8 md:p-10 rounded-3xl bg-slate-900/90 border border-slate-800 backdrop-blur-2xl space-y-8 shadow-2xl relative overflow-hidden">
+        <div className="p-6 sm:p-8 md:p-10 rounded-3xl bg-slate-900/90 border border-slate-800 backdrop-blur-2xl space-y-8 shadow-2xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
             <div className="space-y-1">
               <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
@@ -581,7 +581,7 @@ export const AboutPage: React.FC = () => {
       {isImageZoomed && (
         <div
           onClick={() => setIsImageZoomed(false)}
-          className="fixed inset-0 z-[9999] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 cursor-zoom-out"
+          className="fixed inset-0 z-[9999] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4  cursor-zoom-out"
         >
           <div className="relative max-w-4xl w-full bg-slate-900 border border-white/20 rounded-3xl p-3 sm:p-4 shadow-2xl">
             <button
@@ -604,3 +604,7 @@ export const AboutPage: React.FC = () => {
 };
 
 export default AboutPage;
+
+
+
+

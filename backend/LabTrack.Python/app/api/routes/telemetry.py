@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter
+from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from typing import Optional
 from app.services.telemetry_service import telemetry_service

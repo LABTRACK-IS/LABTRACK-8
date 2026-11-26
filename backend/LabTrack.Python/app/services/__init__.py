@@ -1,4 +1,4 @@
-﻿"""LabTrack Domain Services Package."""
+"""LabTrack Domain Services Package."""
 from app.services.ai_service import AIService
 from app.services.asset_service import AssetService
 from app.services.classification_service import ClassificationService

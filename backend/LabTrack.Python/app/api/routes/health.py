@@ -1,56 +1,13 @@
-from fastapi import APIRouter, status
-from pydantic import BaseModel, Field
 from datetime import datetime
 import platform
 import psutil
-import os
-import logging
+from fastapi import APIRouter, status
+from pydantic import BaseModel, Field
 
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import create_async_engine
-
+from app.db.connection import check_main_db_health as _check_database
 from app.db.vector_db import check_vector_db_health
 
-logger = logging.getLogger("labtrack.health")
-
 router = APIRouter()
-
-
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+asyncpg://postgres:sven292005@localhost:5432/labtrack_db"
-)
-
-_engine = create_async_engine(
-    DATABASE_URL,
-    echo=False,
-    pool_size=5,
-    max_overflow=10,
-    pool_pre_ping=True,
-)
-
-
-async def _check_database() -> dict:
-    try:
-        async with _engine.connect() as conn:
-            row = (await conn.execute(
-                text("SELECT version(), current_database(), current_user")
-            )).fetchone()
-
-            vector_row = (await conn.execute(
-                text("SELECT extversion FROM pg_extension WHERE extname = 'vector'")
-            )).fetchone()
-
-            return {
-                "status": "connected",
-                "database": row[1] if row else None,
-                "user": row[2] if row else None,
-                "server_version": (row[0] or "").split(",")[0] if row else None,
-                "pgvector_version": vector_row[0] if vector_row else "not_installed",
-            }
-    except Exception as e:
-        logger.error("Database health check failed: %s", e)
-        return {"status": "disconnected", "error": str(e)}
 
 
 class DatabaseHealth(BaseModel):
@@ -94,13 +51,19 @@ async def check_health():
         "memory_usage_pct": memory_info.percent,
     }
 
-    db_health = await _check_database()
-    vector_health = await check_vector_db_health()
+    db_health = await _check_database(silent=True)
+    main_ok = db_health.get("status") == "connected"
+    vector_health = (
+        await check_vector_db_health(silent=True)
+        if main_ok
+        else {"status": "disconnected", "pgvector_version": "unavailable"}
+    )
 
     is_degraded = (
         cpu_percent > 90.0
         or memory_info.percent > 90.0
-        or db_health["status"] != "connected"
+        or not main_ok
+        or vector_health.get("status") != "connected"
     )
     status_label = "degraded" if is_degraded else "healthy"
 

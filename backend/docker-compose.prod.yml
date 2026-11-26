@@ -1,51 +1,25 @@
-﻿
-
-version: '3.8'
+# Production overlay:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
 services:
   postgres:
-    ports:
-      - "5432:5432"
+    restart: always
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sven292005}
-    volumes:
-      - postgres_dev_data:/var/lib/postgresql/data
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+
+  python-ai:
+    restart: always
+    environment:
+      PYTHON_ENV: production
+      DEBUG: "false"
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:?Set GEMINI_API_KEY in .env}
 
   api:
-    build:
-      context: .
-      dockerfile: src/LabTrack.Api/Dockerfile
-      target: build
+    restart: always
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_DETAILEDERRORS: "true"
-      LOG_LEVEL: Debug
-      DB_CONNECTION_STRING: "Host=postgres;Port=5432;Database=labtrack_db;Username=postgres;Password=${POSTGRES_PASSWORD:-sven292005};SearchPath=public,auth,inventory,scheduling,telemetry,maintenance,financial,ai,audit"
-    ports:
-      - "8080:8080"
-      - "5000:5000"
-    volumes:
-      - ./src:/src:ro
-
-  ai-engine:
-    build:
-      context: ./backend/python
-      dockerfile: Dockerfile
-    environment:
-      PYTHON_ENV: development
-      LOG_LEVEL: debug
-      DB_CONNECTION_STRING: "postgresql://postgres:${POSTGRES_PASSWORD:-sven292005}@postgres:5432/labtrack_db"
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./backend/python:/app:ro
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-labtrack_db};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
 
   nginx:
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
-
-volumes:
-  postgres_dev_data:
+    restart: always

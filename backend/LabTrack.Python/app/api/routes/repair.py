@@ -1,9 +1,9 @@
-﻿from fastapi import APIRouter, HTTPException, status, Query
+from fastapi import APIRouter, HTTPException, status, Query
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime
 import uuid
-from app.api.routes.ai_chat import _run, _resolve_table, _count
+from app.db.postgres import fetch_query as _run, resolve_table_fqn as _resolve_table, count_rows as _count
 
 router = APIRouter()
 _MEMORY_REPAIRS: list[dict] = []

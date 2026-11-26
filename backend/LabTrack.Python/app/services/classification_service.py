@@ -1,11 +1,9 @@
-﻿import logging
-import uuid
+import logging
 from typing import Dict, Any, List, Optional
-from datetime import datetime
 
 from app.clients.llm_client import LLMClient, LLMCompletionRequest, LLMMessage
-from app.exceptions import LLMInferenceException
-from app.schemas.common import CoreBaseSchema, APIResponseEnvelope
+from app.core.exceptions import LLMInferenceException
+from app.schemas.common import CoreBaseSchema
 from pydantic import Field
 
 logger = logging.getLogger("LabTrack.Python.Services.ClassificationService")

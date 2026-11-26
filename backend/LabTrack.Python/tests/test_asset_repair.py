@@ -17,7 +17,7 @@ from app.schemas.repair import (
     RepairTicketUpdateSchema,
     RepairMetricsSummarySchema,
 )
-from app.exceptions import AssetNotFoundException, CSharpServiceUnavailableException
+from app.core.exceptions import AssetNotFoundException, CSharpServiceUnavailableException
 
 
 # --- Fixtures ---

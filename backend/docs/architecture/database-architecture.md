@@ -6,7 +6,7 @@ This specification documents the low-level database schema design, security mode
 
 ## 1. Relational Architecture & Modular Schemas
 
-The LabTrack database engine relies on a modular **multi-schema architecture** on PostgreSQL 14+ / 16. Domain separation ensures zero cross-domain state leakages and strict boundary isolation.
+The LabTrack database engine relies on a modular **public schema (EF Core) architecture** on PostgreSQL 14+ / 16. Domain separation ensures zero cross-domain state leakages and strict boundary isolation.
 
                                 +-----------------------+
                                 |     public / Core     |
@@ -53,15 +53,15 @@ Backend connection pools establish user context prior to query execution using s
 ```sql
 -- Enforced on every database connection/transaction boundary
 SET LOCAL app.current_user_id = '10000000-0000-0000-0000-000000000002';
-2.2 Standard RLS Policy PatternSQLALTER TABLE inventory.assets ENABLE ROW LEVEL SECURITY;
+2.2 Standard RLS Policy PatternSQLALTER TABLE public.Assets ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY asset_isolation_policy ON inventory.assets
+CREATE POLICY asset_isolation_policy ON public.Assets
     FOR ALL
     USING (
         -- Admin Bypasses
         EXISTS (
-            SELECT 1 FROM auth.users u
-            JOIN auth.roles r ON u.role_id = r.id
+            SELECT 1 FROM public.Users u
+            JOIN public.Roles r ON u.role_id = r.id
             WHERE u.id = NULLIF(current_setting('app.current_user_id', true), '')::UUID
               AND r.name = 'Admin'
         )
@@ -72,14 +72,14 @@ CREATE POLICY asset_isolation_policy ON inventory.assets
             WHERE user_id = NULLIF(current_setting('app.current_user_id', true), '')::UUID
         )
     );
-3. Cryptographic Tamper-Evident Forensic LedgerThe audit.forensic_ledger table guarantees continuous data integrity via an append-only SHA-256 block-chained architecture.3.1 Hash Chaining EquationFor every new audit record $n$:$$H_n = \text{SHA-256}\left( H_{n-1} \mathbin{\Vert} \text{EventUUID} \mathbin{\Vert} \text{ActorID} \mathbin{\Vert} \text{Action} \mathbin{\Vert} \text{PayloadJSON} \mathbin{\Vert} \text{Timestamp} \right)$$where $H_0 = \text{"0000000000000000000000000000000000000000000000000000000000000000"}$.3.2 Block Hash Generator TriggerSQLCREATE OR REPLACE FUNCTION audit.fn_generate_forensic_hash()
+3. Cryptographic Tamper-Evident Forensic LedgerThe public.ForensicLedger table guarantees continuous data integrity via an append-only SHA-256 block-chained architecture.3.1 Hash Chaining EquationFor every new audit record $n$:$$H_n = \text{SHA-256}\left( H_{n-1} \mathbin{\Vert} \text{EventUUID} \mathbin{\Vert} \text{ActorID} \mathbin{\Vert} \text{Action} \mathbin{\Vert} \text{PayloadJSON} \mathbin{\Vert} \text{Timestamp} \right)$$where $H_0 = \text{"0000000000000000000000000000000000000000000000000000000000000000"}$.3.2 Block Hash Generator TriggerSQLCREATE OR REPLACE FUNCTION audit.fn_generate_forensic_hash()
 RETURNS TRIGGER AS $$
 DECLARE
     v_prev_hash TEXT;
 BEGIN
     -- Obtain the hash of the immediately preceding audit row
     SELECT payload_hash INTO v_prev_hash
-    FROM audit.forensic_ledger
+    FROM public.ForensicLedger
     ORDER BY sequence_id DESC
     LIMIT 1;
 
@@ -106,5 +106,5 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-4. Analytical Views & Materialized Performance LayerTo optimize API latency and simplify backend queries, LabTrack maintains four core reporting views:View NamePrimary Source TablesPurposeinventory.v_asset_details_comprehensiveinventory.assets, inventory.lab_bays, inventory.laboratories, inventory.facilities, telemetry.pc_workstations, scheduling.qr_tokensSingle-object 360-degree asset profiling, real-time status counters, location mapping, and telemetry overlays.maintenance.v_dashboard_maintenance_metricsmaintenance.problem_reports, maintenance.repair_tickets, maintenance.preventive_schedules, inventory.assetsOperational KPI dashboard metrics, EHS hazard flags, overdue maintenance tasks, and MTTR aggregations.financial.v_financial_summary_executivefinancial.cost_centers, financial.asset_financial_ledgers, financial.ledger_transactions, maintenance.repair_ticketsExecutive financial summary, institutional asset valuation, accumulated depreciation, and cost center budget health.inventory.v_laboratory_capacity_utilizationinventory.facilities, inventory.laboratories, inventory.lab_bays, inventory.assets, telemetry.pc_workstationsFacility space utilization percentages, lab bay max capacities, asset density, and operational readiness rollups.5. Schema Deployment VerificationThe system includes a verification function to validate database integrity during deployment or automated testing:SQLSELECT * FROM public.fn_verify_labtrack_schema_deployment();
+4. Analytical Views & Materialized Performance LayerTo optimize API latency and simplify backend queries, LabTrack maintains four core reporting views:View NamePrimary Source TablesPurposeinventory.v_asset_details_comprehensiveinventory.assets, inventory.lab_bays, inventory.laboratories, inventory.facilities, telemetry.pc_workstations, scheduling.qr_tokensSingle-object 360-degree asset profiling, real-time status counters, location mapping, and telemetry overlays.maintenance.v_dashboard_maintenance_metricsmaintenance.problem_reports, public.RepairTickets, maintenance.preventive_schedules, inventory.assetsOperational KPI dashboard metrics, EHS hazard flags, overdue maintenance tasks, and MTTR aggregations.financial.v_financial_summary_executivefinancial.cost_centers, public.AssetFinancialLedgers, public.LedgerTransactions, maintenance.repair_ticketsExecutive financial summary, institutional asset valuation, accumulated depreciation, and cost center budget health.inventory.v_laboratory_capacity_utilizationinventory.facilities, inventory.laboratories, inventory.lab_bays, public.Assets, telemetry.pc_workstationsFacility space utilization percentages, lab bay max capacities, asset density, and operational readiness rollups.5. Schema Deployment VerificationThe system includes a verification function to validate database integrity during deployment or automated testing:SQLSELECT * FROM public.fn_verify_labtrack_schema_deployment();
 Expected Output:Returns schema_name, table_count, view_count, function_count, and status = 'VALID'.

@@ -1,11 +1,11 @@
-﻿from fastapi import Header, HTTPException, status
+from fastapi import Header, HTTPException, status
 from pydantic import BaseModel, Field
 from datetime import datetime
 import hmac
 import hashlib
 import time
 from typing import Optional
-from app.config import settings
+from app.core.config import settings
 
 MAX_TIMESTAMP_DELTA_SECONDS = 300
 

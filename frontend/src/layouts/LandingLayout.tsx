@@ -1,16 +1,39 @@
-import React, { useState, createContext, useContext, useRef, useEffect } from 'react';
+import React, { useState, createContext, useContext, useRef, useEffect, useCallback } from 'react';
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { Cpu, Moon, Sun, Menu, X } from "lucide-react";
+import { LandingLoadingScreen } from '@/components/LandingLoadingScreen';
 
 const ThemeContext = createContext({ isDarkMode: false, toggleTheme: () => {} });
 export const useLandingTheme = () => useContext(ThemeContext);
 
 export const LandingLayout: React.FC = () => {
+  const location = useLocation();
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showLandingLoader, setShowLandingLoader] = useState(true);
+  const [revealStage, setRevealStage] = useState<'waiting' | 'revealing' | 'ready'>('waiting');
+  const [routeChangeCount, setRouteChangeCount] = useState(0);
+  const prevPathRef = useRef(location.pathname);
+
+  useEffect(() => {
+    if (prevPathRef.current !== location.pathname) {
+      prevPathRef.current = location.pathname;
+      setRouteChangeCount((c) => c + 1);
+    }
+  }, [location.pathname]);
+
+  const handleRevealStart = useCallback(() => {
+    setRevealStage('revealing');
+  }, []);
+
+  const handleLoaderComplete = useCallback(() => {
+    setShowLandingLoader(false);
+    setRevealStage('ready');
+  }, []);
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [frontPlayer, setFrontPlayer] = useState<'A' | 'B'>('A');
   const [videoSrc, setVideoSrc] = useState<string>("/assets/vedio/vedio.mp4");
-  const location = useLocation();
+  
 
   const videoARef = useRef<HTMLVideoElement | null>(null);
   const videoBRef = useRef<HTMLVideoElement | null>(null);
@@ -103,7 +126,8 @@ export const LandingLayout: React.FC = () => {
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-      <div className={`min-h-screen flex flex-col font-sans relative transition-colors duration-500 overflow-x-hidden ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+      {showLandingLoader && <LandingLoadingScreen onRevealStart={handleRevealStart} onComplete={handleLoaderComplete} />}
+      <div className={`min-h-screen flex flex-col font-sans relative transition-colors duration-500 overflow-x-hidden lt-landing-${revealStage} ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
         
         {/* HARDWARE-ACCELERATED 3D TRANSITIONS (60FPS, ZERO LAG) */}
         <style>{`
@@ -154,7 +178,93 @@ export const LandingLayout: React.FC = () => {
           .nav-link-3d:hover {
             transform: translate3d(0, -2px, 0);
           }
-        `}</style>
+                /* === LT_CINEMATIC_TRANSITION_START === */
+        /* 1. Cinema Camera Pull-Back on Background Video (preserves 700ms opacity A/B loop!) */
+        .lt-landing-waiting video {
+          transform: scale(1.10);
+          filter: brightness(0.68) contrast(1.06) saturate(0.92);
+        }
+        .lt-landing-revealing video {
+          transform: scale(1);
+          filter: brightness(1) contrast(1) saturate(1);
+          transition:
+            transform 1600ms cubic-bezier(0.16, 1, 0.3, 1),
+            filter 1450ms cubic-bezier(0.16, 1, 0.3, 1),
+            opacity 700ms linear !important;
+          will-change: transform, filter, opacity;
+        }
+
+        /* 2. Glass Navbar Silky Drop-In */
+        .lt-landing-waiting nav.nav-3d-glass {
+          opacity: 0;
+          transform: translate3d(0, -24px, 0);
+        }
+        .lt-landing-revealing nav.nav-3d-glass {
+          opacity: 1;
+          transform: translate3d(0, 0, 0);
+          transition:
+            opacity 1150ms cubic-bezier(0.16, 1, 0.3, 1) 180ms,
+            transform 1180ms cubic-bezier(0.16, 1, 0.3, 1) 180ms !important;
+          will-change: transform, opacity;
+        }
+
+        /* 3. Hero Stage Cinematic Focus-Pull Rise */
+        .lt-landing-waiting .lt-landing-stage {
+          opacity: 0;
+          transform: translate3d(0, 32px, 0) scale(0.985);
+          filter: blur(8px);
+        }
+        .lt-landing-revealing .lt-landing-stage {
+          opacity: 1;
+          transform: translate3d(0, 0, 0) scale(1);
+          filter: blur(0px);
+          transition:
+            opacity 1300ms cubic-bezier(0.16, 1, 0.3, 1) 220ms,
+            transform 1380ms cubic-bezier(0.16, 1, 0.3, 1) 220ms,
+            filter 1250ms cubic-bezier(0.16, 1, 0.3, 1) 220ms !important;
+          will-change: transform, opacity, filter;
+        }
+
+        /* 4. Top Luminous Reveal Sweep on Entry */
+        @keyframes ltTopRevealBeam {
+          0% { transform: scaleX(0); opacity: 0.95; }
+          65% { transform: scaleX(1); opacity: 0.85; }
+          100% { transform: scaleX(1); opacity: 0; }
+        }
+        .lt-landing-revealing::before {
+          content: "";
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          z-index: 9998;
+          pointer-events: none;
+          transform-origin: left center;
+          background: linear-gradient(90deg, #2563eb 0%, #38bdf8 50%, #fbbf24 100%);
+          box-shadow: 0 0 18px rgba(56, 189, 248, 0.85);
+          animation: ltTopRevealBeam 1450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* 5. Upgraded Silky Focus-Pull Glide between Landing Tabs (Home / Labs / Features / About) */
+        @keyframes ltLandingRouteGlide {
+          0% {
+            opacity: 0;
+            transform: translate3d(0, 22px, 0) scale(0.988);
+            filter: blur(5px);
+          }
+          100% {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+            filter: blur(0px);
+          }
+        }
+        .animate-page-3d {
+          animation: ltLandingRouteGlide 760ms cubic-bezier(0.16, 1, 0.3, 1) both !important;
+          will-change: transform, opacity, filter;
+        }
+        /* === LT_CINEMATIC_TRANSITION_END === */
+      `}</style>
 
         {/* ULTRA HD SEAMLESS DUAL-VIDEO BACKGROUND (PURE GPU, ZERO LAG, ZERO CUT) */}
         <div className="fixed inset-0 z-0 bg-slate-950 overflow-hidden pointer-events-none">
@@ -301,7 +411,7 @@ export const LandingLayout: React.FC = () => {
 
         {/* MAIN CONTENT WITH SMOOTH 3D PAGE TRANSITION */}
         <main className="flex-1 relative z-10 pt-[60px] sm:pt-[72px] scene-3d-viewport">
-          <div key={location.pathname} className="w-full h-full animate-page-3d">
+          <div key={location.pathname} className={`w-full h-full lt-landing-stage ${routeChangeCount > 0 ? 'animate-page-3d' : ''}`}>
             <Outlet />
           </div>
         </main>

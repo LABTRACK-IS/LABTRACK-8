@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { apiClient } from '../api/apiClient';
+import { apiClient } from '@/lib/api-client';
 
 export interface PcSession {
   sessionId: string;

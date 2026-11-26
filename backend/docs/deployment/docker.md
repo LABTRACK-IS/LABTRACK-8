@@ -90,7 +90,7 @@ services:
   # =========================================================================
   ai:
     build:
-      context: ./backend/python
+      context: ./LabTrack.Python
       dockerfile: Dockerfile
     image: labtrack/ai-engine:latest
     container_name: labtrack-ai-1
@@ -136,7 +136,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-3. Persistent Volumes & Data SecurityTo prevent accidental data loss during container teardowns or image rebuilds, LabTrack utilizes managed Docker volumes:Volume NameTarget Path in ContainerPurposepostgres_data/var/lib/postgresql/dataStores relational tables across all 8 schemas, WAL logs, indices, and pgvector vector embeddings.ai_model_cache/app/modelsCaches transformer models and tokenizer weights locally to avoid redundant downloads on container restart.4. Operational Container CommandsCommon administrative commands for managing the LabTrack containerized stack:Bash# Build and start all services in the background
+3. Persistent Volumes & Data SecurityTo prevent accidental data loss during container teardowns or image rebuilds, LabTrack utilizes managed Docker volumes:Volume NameTarget Path in ContainerPurposepostgres_data/var/lib/postgresql/dataStores relational tables across all public schema (EF Core), WAL logs, indices, and pgvector vector embeddings.ai_model_cache/app/modelsCaches transformer models and tokenizer weights locally to avoid redundant downloads on container restart.4. Operational Container CommandsCommon administrative commands for managing the LabTrack containerized stack:Bash# Build and start all services in the background
 docker compose up --build -d
 
 # Check live health status of all containers

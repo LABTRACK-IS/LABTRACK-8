@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import '@/components/SkeletonLoader3D';
+import React, { useState, useRef, useEffect, useCallback, useMemo, useLayoutEffect } from 'react';
 import {  useParams, useNavigate, useSearchParams, Navigate } from 'react-router-dom';;
 import { 
   AlertTriangle, Clock, CheckCircle2, 
@@ -9,9 +10,9 @@ import {
   UserCheck, Zap, Monitor, RefreshCw, Check, Calendar,
   Printer
 } from 'lucide-react';
-import { usePcSession } from '../../hooks/usePcSession';
-import { apiClient } from '../../api/apiClient';
-import { useAuth } from '../../context/auth-context';
+import { usePcSession } from '@/hooks/usePcSession';
+import { apiClient } from '@/lib/api-client';
+import { useAuth } from '@/context/auth-context';
 
 const COMPLETE_PROBLEM_CATEGORIES = [
   'No Display / Black Screen',
@@ -67,13 +68,13 @@ const determineInitialPc = (fromUrlPc: string | null, capacity: number): string 
     }
   }
 
-  // 2. Kung walang URL param, tsaka lang titingnan ang naka-save sa session
+  // 2. Fallback to saved session if no URL parameter is present
   const claimedInTab = sessionStorage.getItem('labtrack_claimed_pc');
   if (claimedInTab && claimedInTab !== 'PC-FULL') {
     return claimedInTab;
   }
 
-  // 3. Kung wala pa ring naka-save, mag-assign ng bakante
+  // 3. Assign an available workstation if no session is saved
   const occupiedSet = new Set<number>();
   try {
     const raw = localStorage.getItem(OCCUPIED_REGISTRY_KEY);
@@ -257,6 +258,14 @@ export const StudentPortalPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<'home' | 'history' | 'notifications' | 'profile'>('home');
+  const isFirstStudentTabRef = useRef(true);
+  useLayoutEffect(() => {
+    if (isFirstStudentTabRef.current) {
+      isFirstStudentTabRef.current = false;
+      return;
+    }
+    (window as any).__ltTriggerPortalSkeleton?.(1200);
+  }, [activeTab]);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showRulesModal, setShowRulesModal] = useState(false);
   const [showDigitalIdModal, setShowDigitalIdModal] = useState(false);
@@ -601,7 +610,7 @@ Status:     VERIFIED & SECURED SESSION
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white p-6 text-center">
         <div className="max-w-md space-y-6 animate-in fade-in zoom-in-95 duration-300">
-          <div className="w-24 h-24 mx-auto rounded-full bg-blue-500/20 flex items-center justify-center border-2 border-blue-500/50">
+          <div className="w-24 h-24 mx-auto rounded-2xl bg-blue-500/20 flex items-center justify-center border-2 border-blue-500/50 shadow-lg shadow-blue-500/20">
             <svg className="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
             </svg>
@@ -1401,7 +1410,7 @@ Status:     VERIFIED & SECURED SESSION
                 </button>
               </div>
 
-              <div id="printable-receipt" className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700/50 space-y-3 font-mono text-xs relative overflow-hidden">
+              <div id="printable-receipt" className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700/50 space-y-3 font-mono text-xs">
                 <div className="text-center pb-3 border-b border-slate-700 border-dashed">
                   <h4 className="font-black text-lg text-white tracking-widest">JRMSU LABTRACK</h4>
                   <p className="text-[10px] text-slate-400">Official Lab Session Receipt</p>
@@ -1548,3 +1557,7 @@ Status:     VERIFIED & SECURED SESSION
 };
 
 export default StudentPortalPage;
+
+
+
+

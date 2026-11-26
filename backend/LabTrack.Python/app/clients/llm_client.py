@@ -3,7 +3,7 @@ import httpx
 import logging
 from pydantic import BaseModel, Field
 from typing import List, Optional
-from app.config import settings
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 

@@ -1,9 +1,9 @@
-﻿import os
+import os
 import time
 import logging
 from typing import Any, Dict, List, Optional
 from datetime import datetime
-from app.config import settings
+from app.core.config import settings
 
 logger = logging.getLogger("labtrack.postgres")
 

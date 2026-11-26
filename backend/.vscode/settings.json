@@ -1,9 +1,7 @@
-﻿{
-  "python.defaultInterpreterPath": "C:/labtrack/backend/LabTrack.Python/venv/Scripts/python.exe",
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/LabTrack.Python/venv/Scripts/python.exe",
   "python.analysis.extraPaths": [
-    "C:/labtrack/backend/LabTrack.Python",
-    "./backend/LabTrack.Python",
-    "."
+    "${workspaceFolder}/LabTrack.Python"
   ],
   "python.analysis.diagnosticSeverityOverrides": {
     "reportMissingImports": "none",

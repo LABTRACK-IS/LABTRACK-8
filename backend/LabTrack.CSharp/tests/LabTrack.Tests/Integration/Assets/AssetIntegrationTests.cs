@@ -47,8 +47,6 @@ public class AssetIntegrationTests : IAsyncLifetime
             Id = assetId,
             Name = "Lab PC 01",
             SerialNumber = "SN-LAB-001",
-            // IsActive   = true,             // ⚠️ property does not exist on Asset (CS0117)
-            // CreatedAt  = DateTime.UtcNow,  // ⚠️ property does not exist on Asset (CS0117)
         };
 
         await _dbContext.Assets.AddAsync(asset);
@@ -75,8 +73,6 @@ public class AssetIntegrationTests : IAsyncLifetime
             Id = Guid.NewGuid(),
             Name = "Precision Workstation",
             SerialNumber = "SN-WORKSTATION-99",
-            // IsActive   = true,             // ⚠️ CS0117
-            // CreatedAt  = DateTime.UtcNow,  // ⚠️ CS0117
         };
 
         // Act
@@ -102,8 +98,6 @@ public class AssetIntegrationTests : IAsyncLifetime
             Id = assetId,
             Name = "Legacy Rig",
             SerialNumber = "SN-OLD-01",
-            // IsActive   = true,             // ⚠️ CS0117
-            // CreatedAt  = DateTime.UtcNow,  // ⚠️ CS0117
         };
 
         await _dbContext.Assets.AddAsync(asset);
@@ -131,8 +125,6 @@ public class AssetIntegrationTests : IAsyncLifetime
             Id = assetId,
             Name = "Decommissioned Unit",
             SerialNumber = "SN-DEC-01",
-            // IsActive   = false,            // ⚠️ CS0117
-            // CreatedAt  = DateTime.UtcNow,  // ⚠️ CS0117
         };
 
         await _dbContext.Assets.AddAsync(asset);

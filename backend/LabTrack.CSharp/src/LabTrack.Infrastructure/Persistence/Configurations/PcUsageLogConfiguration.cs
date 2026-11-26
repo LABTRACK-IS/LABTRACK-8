@@ -1,4 +1,4 @@
-﻿using LabTrack.Domain.Entities;
+using LabTrack.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -16,7 +16,7 @@ public class PcUsageLogConfiguration : IEntityTypeConfiguration<PcUsageLog>
             .ValueGeneratedNever();
 
         builder.Property(p => p.UserId)
-            .IsRequired();
+            .IsRequired(false);
 
         builder.HasOne(p => p.User)
             .WithMany()

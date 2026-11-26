@@ -186,7 +186,7 @@ export const FeaturesPage: React.FC = () => {
           </div>
 
           {/* KANAN: DYNAMIC LIVE FEATURE CANVAS PREVIEW */}
-          <div className="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 backdrop-blur-2xl shadow-2xl flex flex-col justify-between space-y-6 relative overflow-hidden">
+          <div className="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 backdrop-blur-2xl shadow-2xl flex flex-col justify-between space-y-6">
             
             {/* Gradient Glow */}
             <div className={`absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br ${currentFeature.accentColor} opacity-10 blur-[90px] rounded-full pointer-events-none`} />
@@ -407,3 +407,7 @@ export const FeaturesPage: React.FC = () => {
 };
 
 export default FeaturesPage;
+
+
+
+

@@ -1,12 +1,13 @@
+import '@/components/SkeletonLoader3D';
 import React from "react";
 import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
-import PortalShell from "./components/portal/PortalShell";
+import PortalShell from '@/layouts/PortalShell';
 import { StudentPortalPage } from "./pages/student/student-portal-page";
 import { LoginPage } from "./pages/auth/login-page";
 import { RegisterPage } from "./pages/auth/register-page";
 import { ForgotPasswordPage } from "./pages/auth/forgot-password-page";
-import GlobalAiChatbot from "./components/common/GlobalAiChatbot";
-import { LandingLayout } from "./layouts/LandingLayout";
+import GlobalAiChatbot from '@/components/GlobalAiChatbot';
+import { LandingLayout } from '@/layouts/LandingLayout';
 import { HomePage } from "./pages/landing/HomePage";
 import { LaboratoriesPage } from "./pages/landing/LaboratoriesPage";
 import { FeaturesPage } from "./pages/landing/FeaturesPage";

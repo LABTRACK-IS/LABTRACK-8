@@ -1,6 +1,6 @@
-﻿from fastapi import APIRouter
+from fastapi import APIRouter
 from datetime import datetime
-from app.api.routes.ai_chat import _count
+from app.db.postgres import count_rows as _count
 
 router = APIRouter()
 
